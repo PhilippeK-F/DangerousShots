@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (ne pas versionner les données brutes lourdes)
+data/raw/*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log

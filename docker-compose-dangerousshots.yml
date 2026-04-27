@@ -1,0 +1,9 @@
+services:
+
+  dangerousshots:
+    build: .
+    container_name: dangerousshots_app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
