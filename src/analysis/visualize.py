@@ -102,3 +102,61 @@ def plot_budget_vs_gravite(df: pd.DataFrame) -> plt.Figure:
     ax.legend()
     plt.tight_layout()
     return fig
+
+
+def plot_note_imdb_par_genre(df: pd.DataFrame) -> plt.Figure:
+    """Note IMDb moyenne par genre simplifié."""
+    agg = df.groupby("genre_simplifie")["note_imdb"].mean().reset_index()
+    agg = agg.dropna().sort_values("note_imdb", ascending=False)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    sns.barplot(data=agg, x="genre_simplifie", y="note_imdb", ax=ax, color="#2c3e50")
+    ax.set_title("Note IMDb moyenne par genre")
+    ax.set_xlabel("Genre")
+    ax.set_ylabel("Note IMDb")
+    ax.set_ylim(0, 10)
+    plt.xticks(rotation=30, ha="right")
+    plt.tight_layout()
+    return fig
+
+
+def plot_boxoffice_vs_gravite(df: pd.DataFrame) -> plt.Figure:
+    """Box-office moyen selon la gravité de l'incident."""
+    agg = df.groupby("gravite")["box_office_million_usd"].mean().reset_index().dropna()
+    fig, ax = plt.subplots(figsize=(7, 4))
+    sns.barplot(data=agg, x="gravite", y="box_office_million_usd",
+                palette={"Décès": "#e74c3c", "Blessure": "#f39c12"}, ax=ax)
+    ax.set_title("Box-office moyen par gravité d'incident (M$)")
+    ax.set_xlabel("")
+    ax.set_ylabel("Box-office moyen (M$)")
+    plt.tight_layout()
+    return fig
+
+
+def plot_roi_par_tranche_budget(df: pd.DataFrame) -> plt.Figure:
+    """ROI moyen par tranche de budget."""
+    agg = df.groupby("tranche_budget", observed=True)["roi"].mean().reset_index().dropna()
+    fig, ax = plt.subplots(figsize=(10, 5))
+    sns.barplot(data=agg, x="tranche_budget", y="roi", ax=ax, color="#27ae60")
+    ax.set_title("ROI moyen par tranche de budget")
+    ax.set_xlabel("Tranche de budget")
+    ax.set_ylabel("ROI (box-office / budget)")
+    plt.xticks(rotation=30, ha="right")
+    plt.tight_layout()
+    return fig
+
+
+def plot_note_vs_budget(df: pd.DataFrame) -> plt.Figure:
+    """Scatter plot note IMDb vs budget."""
+    data = df.dropna(subset=["note_imdb", "budget_million_usd"])
+    fig, ax = plt.subplots(figsize=(10, 5))
+    colors = data["gravite"].map({"Décès": "#e74c3c", "Blessure": "#f39c12"})
+    ax.scatter(data["budget_million_usd"], data["note_imdb"],
+               c=colors, s=80, alpha=0.8)
+    ax.set_title("Note IMDb vs Budget — couleur par gravité")
+    ax.set_xlabel("Budget (M$)")
+    ax.set_ylabel("Note IMDb")
+    from matplotlib.patches import Patch
+    legend = [Patch(color="#e74c3c", label="Décès"), Patch(color="#f39c12", label="Blessure")]
+    ax.legend(handles=legend)
+    plt.tight_layout()
+    return fig

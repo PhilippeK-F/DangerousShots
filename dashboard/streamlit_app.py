@@ -20,6 +20,10 @@ from src.analysis.visualize import (
     plot_type_accident,
     plot_budget_vs_gravite,
     plot_distribution,
+    plot_note_imdb_par_genre,
+    plot_boxoffice_vs_gravite,
+    plot_roi_par_tranche_budget,
+    plot_note_vs_budget,
 )
 
 st.set_page_config(
@@ -29,7 +33,7 @@ st.set_page_config(
 )
 
 st.title("DangerousShots")
-st.markdown("Analyse des accidents et décès sur tournages de films et séries (2004–2024)")
+st.markdown("Analyse des accidents et décès sur tournages de films et séries TV (2004–2024)")
 
 @st.cache_data
 def load_data() -> pd.DataFrame:
@@ -38,6 +42,9 @@ def load_data() -> pd.DataFrame:
 df_raw = load_data()
 df = clean(df_raw)
 
+# ---------------------------------------------------------------------------
+# Sidebar — filtres
+# ---------------------------------------------------------------------------
 st.sidebar.header("Filtres")
 
 annees = sorted(df["annee"].dropna().unique().tolist())
@@ -65,6 +72,9 @@ types_prod = df["type_production"].dropna().unique().tolist()
 selected_types = st.sidebar.multiselect("Type de production", options=types_prod, default=types_prod)
 df = df[df["type_production"].isin(selected_types)]
 
+# ---------------------------------------------------------------------------
+# KPIs
+# ---------------------------------------------------------------------------
 st.subheader("Indicateurs clés")
 kpis = compute_kpis(df)
 cols = st.columns(len(kpis))
@@ -73,47 +83,67 @@ for col, (label, value) in zip(cols, kpis.items()):
 
 st.divider()
 
-col1, col2 = st.columns(2)
+# ---------------------------------------------------------------------------
+# Onglets
+# ---------------------------------------------------------------------------
+tab1, tab2, tab3 = st.tabs(["Sécurité", "Production & Budget", "Données brutes"])
 
-with col1:
-    st.subheader("Évolution annuelle des incidents")
-    fig = plot_evolution_annuelle(incidents_par_annee(df))
+with tab1:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Évolution annuelle des incidents")
+        fig = plot_evolution_annuelle(incidents_par_annee(df))
+        st.pyplot(fig)
+    with col2:
+        st.subheader("Incidents par genre")
+        fig = plot_gravite_par_genre(df)
+        st.pyplot(fig)
+
+    col3, col4 = st.columns(2)
+    with col3:
+        st.subheader("Types d'accidents")
+        fig = plot_type_accident(df)
+        st.pyplot(fig)
+    with col4:
+        st.subheader("Budget vs gravité")
+        fig = plot_budget_vs_gravite(df)
+        st.pyplot(fig)
+
+with tab2:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Note IMDb vs Budget")
+        fig = plot_note_vs_budget(df)
+        st.pyplot(fig)
+    with col2:
+        st.subheader("Note IMDb par genre")
+        fig = plot_note_imdb_par_genre(df)
+        st.pyplot(fig)
+
+    col3, col4 = st.columns(2)
+    with col3:
+        st.subheader("Box-office moyen par gravité")
+        fig = plot_boxoffice_vs_gravite(df)
+        st.pyplot(fig)
+    with col4:
+        st.subheader("ROI par tranche de budget")
+        fig = plot_roi_par_tranche_budget(df)
+        st.pyplot(fig)
+
+    st.subheader("Distribution des budgets")
+    fig = plot_distribution(df, "budget_million_usd", "Distribution des budgets (M$)")
     st.pyplot(fig)
 
-with col2:
-    st.subheader("Incidents par genre")
-    fig = plot_gravite_par_genre(df)
-    st.pyplot(fig)
+with tab3:
+    cols_display = ["annee", "film", "genre_simplifie", "type_production",
+                    "victime", "categorie_victime", "type_accident",
+                    "gravite", "budget_million_usd", "box_office_million_usd",
+                    "note_imdb", "roi", "pays_tournage"]
+    st.dataframe(df[cols_display].sort_values("annee", ascending=False),
+                 use_container_width=True)
 
-st.divider()
+    with st.expander("Voir toutes les colonnes"):
+        st.dataframe(df, use_container_width=True)
 
-col3, col4 = st.columns(2)
-
-with col3:
-    st.subheader("Types d'accidents")
-    fig = plot_type_accident(df)
-    st.pyplot(fig)
-
-with col4:
-    st.subheader("Budget vs gravité")
-    fig = plot_budget_vs_gravite(df)
-    st.pyplot(fig)
-
-st.divider()
-
-st.subheader("Distribution des budgets")
-fig = plot_distribution(df, "budget_million_usd", "Distribution des budgets (M$)")
-st.pyplot(fig)
-
-st.divider()
-
-st.subheader("Détail des incidents")
-cols_display = ["annee", "film", "genre_simplifie", "type_production",
-                "victime", "categorie_victime", "type_accident",
-                "gravite", "budget_million_usd", "pays_tournage"]
-st.dataframe(df[cols_display].sort_values("annee", ascending=False), use_container_width=True)
-
-with st.expander("Voir toutes les colonnes"):
-    st.dataframe(df, use_container_width=True)
     csv = df.to_csv(index=False).encode("utf-8")
     st.download_button("Télécharger CSV", csv, "dangerous_shots_export.csv", "text/csv")
