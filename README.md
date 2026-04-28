@@ -16,7 +16,9 @@ L'objectif est de croiser les données de sécurité (type d'accident, gravité,
 | Pandas | Nettoyage et analyse |
 | Matplotlib / Seaborn | Visualisations |
 | Streamlit | Dashboard interactif |
+| Power BI | Dashboard analytics |
 | Docker | Conteneurisation |
+| GitHub | Versioning |
 
 ---
 
@@ -26,22 +28,23 @@ L'objectif est de croiser les données de sécurité (type d'accident, gravité,
 DangerousShots/
 │
 ├── data/
-│   ├── raw/                        # Données brutes
+│   ├── raw/
 │   └── processed/
 │       └── accidents_clean.csv     # Dataset enrichi (25 incidents, 24 colonnes)
 │
 ├── src/
 │   ├── loaders/
-│   │   └── load_csv.py             # Chargement des données
+│   │   └── load_csv.py
 │   └── analysis/
-│       ├── clean.py                # Nettoyage et typage
-│       ├── analyze.py              # KPIs et agrégations
-│       └── visualize.py            # Graphiques
+│       ├── clean.py
+│       ├── analyze.py
+│       └── visualize.py
 │
 ├── dashboard/
-│   └── streamlit_app.py            # Dashboard Streamlit
+│   ├── streamlit_app.py            # Dashboard Streamlit (3 onglets)
+│   └── DangerousShots.pbix         # Dashboard Power BI
 │
-├── notebooks/                      # Analyses exploratoires Jupyter
+├── notebooks/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
@@ -80,13 +83,20 @@ DangerousShots/
 
 ---
 
-## Principaux enseignements
+## Dashboards
 
-1. **Les techniciens sont les premières victimes** — 80% des incidents concernent cascadeurs, cadreurs et équipes techniques
-2. **Les films d'action concentrent la majorité des accidents** — explosions, cascades moto et véhicules
-3. **Le budget n'est pas un facteur protecteur** — plusieurs blockbusters à 200M$+ sont impliqués
-4. **Les chutes et accidents de véhicules** sont les causes les plus fréquentes
-5. **Les séries TV** sont sous-représentées dans les données publiques malgré un volume de production élevé
+### Streamlit (3 onglets)
+- **Sécurité** — évolution annuelle, incidents par genre, types d'accidents, budget vs gravité
+- **Production & Budget** — note IMDb vs budget, box-office par gravité, ROI par tranche de budget
+- **Données brutes** — table complète + export CSV
+
+### Power BI
+- 3 KPI Cards : Note IMDb moyenne, Total incidents, Box-office moyen
+- 2 Slicers : Pays de tournage, Genre
+- Line chart : Incidents par année
+- Bar chart : Accidents par type
+- Table : Films avec notes, gravité et budget
+- Carte : Incidents par pays de tournage
 
 ---
 
@@ -122,7 +132,30 @@ streamlit run dashboard/streamlit_app.py
 
 ---
 
+## Principaux enseignements
+
+1. **Les chutes sont la première cause d'accident** — 10 incidents sur 25, loin devant les cascades (4) et les explosions (2)
+2. **Les techniciens représentent 80% des victimes** — cascadeurs, cadreurs et équipes techniques sont les plus exposés
+3. **Les films d'action concentrent la majorité des incidents** — explosions, cascades moto et véhicules
+4. **Le budget n'est pas un facteur protecteur** — plusieurs blockbusters à plus de 200M$ sont impliqués
+5. **Les USA sont le pays de tournage le plus à risque** — volume de production oblige
+6. **Note IMDb moyenne des films concernés : 7.34/10** — ce sont majoritairement de grosses productions populaires
+
+---
+
+## Conclusion
+
+Ce projet met en lumière une réalité souvent invisible du cinéma : derrière les blockbusters les plus populaires et les mieux notés se cachent des accidents graves, parfois mortels, qui touchent avant tout les techniciens de l'ombre.
+
+L'analyse montre que ni le budget, ni la notoriété d'une production ne garantissent la sécurité sur un plateau. Les chutes et accidents de cascade restent les causes dominantes, et les séries TV — malgré un volume de production croissant — restent sous-documentées dans les données publiques disponibles.
+
+Ce dataset, construit manuellement à partir de sources publiques, constitue une base de travail qu'il serait pertinent d'enrichir via un scraping systématique de Wikipedia et des rapports OSHA pour une analyse plus exhaustive.
+
+---
+
 ## Auteur
 
 **Philippe Kirstetter-Fender**
 Projet personnel — Data Analyst / Data Engineer
+
+En recherche active d'un poste de Data Engineer en France et à l'étranger.
